@@ -1,18 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { AccountEntity } from 'src/account/entity/account.entity';
 
-@Entity({
-  name: 'payment',
-})
+@Entity('payments')
 export class PaymentEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  value: number;
-
-  @Column()
-  date: string;
+  date: Date;
 
   @Column()
   description: string;
+
+  @Column('decimal')
+  value: number;
+
+  @ManyToOne(() => AccountEntity, (account) => account.payments)
+  account: AccountEntity;
 }

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { PaymentEntity } from 'src/payment/entity/payment.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity({
   name: 'account',
@@ -15,4 +16,7 @@ export class AccountEntity {
 
   @Column()
   balance: number;
+
+  @OneToMany(() => PaymentEntity, (payment) => payment.account)
+  payments: PaymentEntity[];
 }

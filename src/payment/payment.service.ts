@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { PaymentEntity } from './entity/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -29,6 +29,7 @@ export class PaymentService {
       );
     }
   }
+
   async isValidIdAccount(id: string) {
     const user = await this.accountRepository.findOne({
       where: {
@@ -52,6 +53,7 @@ export class PaymentService {
         id: accountId,
       },
     });
+
     if (account.balance <= value) {
       throw new HttpException(`Saldo insuficiente.`, HttpStatus.BAD_REQUEST);
     }
@@ -60,17 +62,35 @@ export class PaymentService {
     await this.isValidIdAccount(accountId);
 
     const id = uuidv4();
-    const user = this.paymentRepository.create({
+    const payment = this.paymentRepository.create({
       id,
       date,
       description,
       value,
+      account,
     });
-    return this.paymentRepository.save(user);
+    return this.paymentRepository.save(payment);
   }
 
   async findAll() {
     return await this.paymentRepository.find();
+  }
+
+  async getReport(accountId: string, startDate?: Date, endDate?: Date) {
+    await this.isValidIdAccount(accountId);
+
+    const whereCondition: any = { account: { id: accountId } };
+
+    if (startDate && endDate) {
+      whereCondition.date = Between(startDate, endDate);
+    } else if (startDate) {
+      whereCondition.date = Between(startDate, new Date());
+    }
+
+    return this.paymentRepository.find({
+      where: whereCondition,
+      relations: ['account'],
+    });
   }
 
   async findOne(id: string) {
