@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
+import { UserEntity } from 'src/user/entity/user.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,17 +16,23 @@ export class AuthGuard implements CanActivate {
     const { authorization } = request.headers;
 
     try {
-      const data = this.authService.checkToken(
-        (authorization ?? '').split(' ')[1],
-      );
+      const token = (authorization ?? '').split(' ')[1];
+      const data = this.authService.checkToken(token);
 
       request.tokenPayload = data;
 
-      request.user = await this.userService.findOne(data.id);
+      const user: UserEntity = await this.userService.findOne(data.id);
 
-      return true;
+      if (!user) {
+        return false; // Se o usuário não for encontrado
+      }
+
+      // Defina a propriedade user no request para acessar no controlador posteriormente
+      request.user = user;
+
+      return true; // Permita o acesso se todas as condições forem atendidas
     } catch (error) {
-      return false;
+      return false; // Em caso de erro, negue o acesso
     }
   }
 }

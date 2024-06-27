@@ -1,15 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
-import { AccountModule } from './account/account.module';
-import { AccountEntity } from './account/entity/account.entity';
 import { AuthModule } from './auth/auth.module';
+import { AccountModule } from './account/account.module';
 import { PaymentModule } from './payment/payment.module';
+import { UserEntity } from './user/entity/user.entity';
+import { AccountEntity } from './account/entity/account.entity';
 import { PaymentEntity } from './payment/entity/payment.entity';
 
 @Module({
   imports: [
+    forwardRef(() => AuthModule),
+    forwardRef(() => UserModule),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -20,9 +22,9 @@ import { PaymentEntity } from './payment/entity/payment.entity';
       entities: [UserEntity, AccountEntity, PaymentEntity],
       synchronize: true,
     }),
-    AccountModule,
     UserModule,
     AuthModule,
+    AccountModule,
     PaymentModule,
   ],
 })
