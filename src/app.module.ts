@@ -7,6 +7,8 @@ import { PaymentModule } from './payment/payment.module';
 import { UserEntity } from './user/entity/user.entity';
 import { AccountEntity } from './account/entity/account.entity';
 import { PaymentEntity } from './payment/entity/payment.entity';
+import { FilesModule } from './files/files.module';
+import { File } from './files/entity/file.entity';
 
 @Module({
   imports: [
@@ -19,9 +21,10 @@ import { PaymentEntity } from './payment/entity/payment.entity';
       username: 'postgres',
       password: '010203',
       database: 'postgres',
-      entities: [UserEntity, AccountEntity, PaymentEntity],
+      entities: [UserEntity, AccountEntity, PaymentEntity, File],
       synchronize: true,
     }),
+    FilesModule,
     UserModule,
     AuthModule,
     AccountModule,

@@ -8,9 +8,10 @@ import { UserModule } from '../user/user.module';
 import { UserEntity } from '../user/entity/user.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccountEntity } from '../account/entity/account.entity';
+import { File } from 'src/files/entity/file.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PaymentEntity, UserEntity, AccountEntity]),
+    TypeOrmModule.forFeature([PaymentEntity, UserEntity, AccountEntity, File]),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
   ],
