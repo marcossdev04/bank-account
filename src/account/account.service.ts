@@ -28,6 +28,12 @@ export class AccountService {
   }
 
   async create({ account_type, balance, name }: CreateAccountDto) {
+    if (balance < 0) {
+      throw new HttpException(
+        'O saldo não pode ser menor que 0.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const id = uuidv4();
     const user = this.accountRepository.create({
       id,
@@ -50,6 +56,12 @@ export class AccountService {
 
   async update(id: string, { account_type, balance, name }: UpdateAccountDto) {
     await this.isValidId(id);
+    if (balance < 0) {
+      throw new HttpException(
+        'O saldo não pode ser menor que 0.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     await this.accountRepository.update(id, {
       account_type,
       balance,

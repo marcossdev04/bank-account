@@ -48,18 +48,18 @@ export class PaymentService {
     accountId: string,
     { date, description, value }: CreatePaymentDto,
   ) {
+    await this.isValidIdAccount(accountId);
     const account = await this.accountRepository.findOne({
       where: {
         id: accountId,
       },
     });
 
-    if (account.balance <= value) {
+    if (account.balance < value) {
       throw new HttpException(`Saldo insuficiente.`, HttpStatus.BAD_REQUEST);
     }
     account.balance -= value;
     await this.accountRepository.save(account);
-    await this.isValidIdAccount(accountId);
 
     const id = uuidv4();
     const payment = this.paymentRepository.create({
@@ -101,6 +101,18 @@ export class PaymentService {
 
   async update(id: string, { date, description, value }: UpdatePaymentDto) {
     await this.isValidId(id);
+    const payment = await this.findOne(id);
+    const account = payment.account;
+
+    const difference = value - payment.value;
+
+    if (account.balance < difference) {
+      throw new HttpException(`Saldo insuficiente.`, HttpStatus.BAD_REQUEST);
+    }
+
+    account.balance -= difference;
+    await this.accountRepository.save(account);
+
     await this.paymentRepository.update(id, {
       date,
       description,
@@ -111,6 +123,12 @@ export class PaymentService {
 
   async delete(id: string) {
     await this.isValidId(id);
+    const payment = await this.findOne(id);
+    const account = payment.account;
+
+    account.balance += payment.value;
+    await this.accountRepository.save(account);
+
     await this.paymentRepository.delete(id);
     return true;
   }
