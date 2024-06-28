@@ -51,6 +51,6 @@ export class FilesController {
         'Apenas arquivos de imagem são permitidos!',
       );
     }
-    return this.filesService.salvarDados(file, paymentId);
+    return this.filesService.saveData(file, paymentId);
   }
 }

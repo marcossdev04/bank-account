@@ -13,7 +13,7 @@ export class FilesService {
     private paymentRepository: Repository<PaymentEntity>,
   ) {}
 
-  async salvarDados(file: Express.MulterS3.File, paymentId: string) {
+  async saveData(file: Express.MulterS3.File, paymentId: string) {
     const payment = await this.paymentRepository.findOne({
       where: { id: paymentId },
     });
@@ -23,13 +23,13 @@ export class FilesService {
       );
     }
 
-    const arquivo = new File();
-    arquivo.fileName = file.key;
-    arquivo.contentLength = file.size;
-    arquivo.contentType = file.mimetype;
-    arquivo.url = file.location;
-    arquivo.payment = payment;
+    const newFile = new File();
+    newFile.fileName = file.key;
+    newFile.contentLength = file.size;
+    newFile.contentType = file.mimetype;
+    newFile.url = file.location;
+    newFile.payment = payment;
 
-    return await this.fotoRepository.save(arquivo);
+    return await this.fotoRepository.save(newFile);
   }
 }
